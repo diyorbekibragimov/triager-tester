@@ -1,5 +1,5 @@
 name: tester
-run-name: ${{ github.actor }} is learning Github actions
+run-name: tester 1
 on: [issue_comment]
 jobs: 
     issue_commented:
