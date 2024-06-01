@@ -1,0 +1,24 @@
+name: tester
+run-name: ${{ github.actor }} is learning Github actions
+on: [issue_comment]
+jobs: 
+    issue_commented:
+        runs-on: ubuntu-latest
+        steps:
+            - name: commenting on the issue
+              id: comment
+              uses: actions/github-script@v4
+              with:
+                script:  |
+                  const commentBody = context.payload.comment.body;
+                  if (commentBody.startsWith( 'TriagerX' )) {
+                    const name = commentBody.split(' ').slice(1).join(' ');
+                    github.issues.createComment({
+                      issue_number: context.issue.number,
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      body: `Hello ${name}!`,
+                    });
+                  }
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
