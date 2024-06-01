@@ -3,6 +3,7 @@ run-name: tester 1
 on: [issue_comment]
 jobs: 
     issue_commented:
+        name: Issue comment
         runs-on: ubuntu-latest
         steps:
             - name: commenting on the issue
