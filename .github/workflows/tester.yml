@@ -1,5 +1,5 @@
-name: tester
-run-name: tester 1
+name: Echo User Input
+run-name: Testing Github Actions
 on: [issue_comment]
 jobs: 
     issue_commented:
@@ -12,14 +12,38 @@ jobs:
               with:
                 script:  |
                   const commentBody = context.payload.comment.body;
-                  if (commentBody.startsWith( 'TriagerX' )) {
-                    const name = commentBody.split(' ').slice(1).join(' ');
-                    github.issues.createComment({
-                      issue_number: context.issue.number,
-                      owner: context.repo.owner,
-                      repo: context.repo.repo,
-                      body: `Hello ${name}!`,
-                    });
+                  if (commentBody.startsWith('TriagerX')) {
+                    const secondPart = commentBody.split(' ')[1];
+                    if (secondPart.startsWith('http')) {
+                      const issueUrl = secondPart;
+                      const issueNumber = issueUrl.split('/').pop();
+                      const issueRepo = issueUrl.split('/')[4];
+                      const issueOwner = issueUrl.split('/')[3];
+                      
+                      const issue = await github.issues.get({
+                        owner: issueOwner,
+                        repo: issueRepo,
+                        issue_number: issueNumber,
+                      });
+
+                      const issueTitle = issue.data.title;
+                      const issueDescription = issue.data.body;
+
+                      github.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: `Issue Title: ${issueTitle}\nIssue Description: ${issueDescription}`,
+                      });
+                    } else {
+                      const name = commentBody.split(' ').slice(1).join(' ');
+                      github.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: `Hi ${name}! How can we help you today?`,
+                      });
+                    }
                   }
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
